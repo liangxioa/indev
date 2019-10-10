@@ -3,7 +3,6 @@ import sys
 
 from flask import Blueprint, request
 from model import userModel
-import time
 
 userRouter = Blueprint('user', __name__, url_prefix="/user")  # 蓝图的对象的名称=Blueprint('自定义蓝图名称',__name__)
 
@@ -33,6 +32,7 @@ def login():
         else:
             returnData["msg"] = "账号或密码不正确"
     except:
+        returnData["msg"] = "登录失败"
         print("Unexpected error:", sys.exc_info()[0])
     return returnData
 
@@ -51,15 +51,23 @@ def reg():
     username = request.form['username']
     password = request.form["password"]
     try:
-        hasUser = userModel.getUserIDByUserName(username, password)
-        if hasUser: # 存在该用户名的用户
+        hasUser = userModel.getUserIDByUserName(username)  # 查询该用户名是否存在
+        if hasUser:
             returnData["msg"] = "该用户已存在"
         else:
-            result = userModel.insertUser(username,password) #创建新用户
-            if result:
-                returnData["msg"] = "注册成功"
-            else:
+            try:
+                result = userModel.insertUser(username, password)  # 创建新用户
+                print(result)
+                if result:
+                    returnData["msg"] = "注册成功"
+                    returnData["success"] = True
+                else:
+                    returnData["msg"] = "注册失败"
+            except:
                 returnData["msg"] = "注册失败"
+                print("错误：创建新用户报错，错误信息：", sys.exc_info()[0])
     except:
-        print("Unexpected error:", sys.exc_info()[0])
+        returnData["msg"] = "注册失败"
+        print("错误：查询用户名是否存在报错，错误信息：", sys.exc_info()[0])
+
     return returnData

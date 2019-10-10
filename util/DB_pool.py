@@ -4,6 +4,7 @@
 ２、在格式ＳＱＬ中不需要使用引号指定数据类型，系统会根据输入参数自动识别
 ３、在输入的值中不需要使用转意函数，系统会自动处理
 """
+import sys
 
 import pymysql
 from DBUtils.PooledDB import PooledDB
@@ -103,7 +104,14 @@ class Mysql(object):
         @param value:要插入的记录数据tuple/list
         @return: insertId 受影响的行数
         """
-        self._cursor.execute(sql, value)
+        try:
+            # 执行sql语句
+            self._cursor.execute(sql, value)
+            # 提交到数据库执行
+            self._conn.commit()
+        except:
+            # 如果发生错误则回滚
+            self._conn.rollback()
         return self.__getInsertId()
 
     def insertMany(self, sql, values):
@@ -113,7 +121,15 @@ class Mysql(object):
         @param values:要插入的记录数据tuple(tuple)/list[list]
         @return: count 受影响的行数
         """
-        count = self._cursor.executemany(sql, values)
+        count = None
+        try:
+            # 执行sql语句
+            count = self._cursor.executemany(sql, values)
+            # 提交到数据库执行
+            self._conn.commit()
+        except:
+            # 如果发生错误则回滚
+            self._conn.rollback()
         return count
 
     def __getInsertId(self):
