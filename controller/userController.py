@@ -57,7 +57,6 @@ def reg():
         else:
             try:
                 result = userModel.insertUser(username, password)  # 创建新用户
-                print(result)
                 if result:
                     returnData["msg"] = "注册成功"
                     returnData["success"] = True

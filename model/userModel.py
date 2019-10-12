@@ -1,25 +1,28 @@
 # coding:utf-8
-from util import DB_pool as db
+from util import MyDbUtils
+
+mysql = MyDbUtils.Mysql()
 
 
 def login(username, password):
     sql = "SELECT id FROM user WHERE username=%s and password=%s"
-    result = db.getOne(sql, [username, password])
+    result = mysql.selectone(sql, [username, password])
     return result
 
 
 def insertUser(username, password):
     sql = "INSERT INTO user (username,password) VALUES (%s,%s)"
-    result = db.insertOne(sql, (username, password))
+    result = mysql.insert(sql, (str(username), str(password)))
     return result
 
 
 def getUserById(id):
     sql = "SELECT * FROM user WHERE id=%s"
-    result = db.getOne(sql, id)
+    result = mysql.selectone(sql, id)
     return result
+
 
 def getUserIDByUserName(username):
     sql = "SELECT id FROM user WHERE username=%s"
-    result = db.getOne(sql, username)
+    result = mysql.selectone(sql, username)
     return result
